@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AdvenTour - Trang quản lý du lịch</title>
+
+</head>
+<body>
+<div id="sidebar" th:fragment="sidebar">
+    <div class="sidebar-wrapper active">
+        <div class="sidebar-header position-relative">
+            <div class="logo">
+                <a th:href="@{/dashboard}"><img th:src="@{/compiled/svg/logo.svg}" alt="Logo" srcset=""></a>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+            <ul class="menu">
+                <li
+                        class="sidebar-item" id="dashboard">
+                    <a th:href="@{/dashboard}" class='sidebar-link'>
+                        <i class="bi bi-grid-fill"></i>
+                        <span>Trang chủ</span>
+                    </a>
+                </li>
+
+                <li
+                        class="sidebar-item" id="customer">
+                    <a th:href="@{/customer}" class='sidebar-link'>
+                        <i class="bi bi-people-fill"></i>
+                        <span>Khách hàng</span>
+                    </a>
+                </li>
+
+                <li
+                        class="sidebar-item" id="tour">
+                    <a th:href="@{/all-tour}" class='sidebar-link'>
+                        <i class="bi bi-signpost-2-fill"></i>
+                        <span>Tuyến du lịch</span>
+                    </a>
+                </li>
+
+                <li
+                        class="sidebar-item" id="trip">
+                    <a th:href="@{/alltrip}" class='sidebar-link'>
+                        <i class="bi bi-calendar-check-fill"></i>
+                        <span>Chuyến du lịch</span>
+                    </a>
+                </li>
+
+                <li
+                        class="sidebar-item" id="booking">
+                    <a th:href="@{/all-booking}" class='sidebar-link'>
+                        <i class="bi bi-ticket-perforated-fill"></i>
+                        <span>Đặt chỗ và bán vé</span>
+                    </a>
+                </li>
+
+                <li
+                        class="sidebar-item" id="place">
+                    <a th:href="@{/all-place}" class='sidebar-link'>
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>Địa điểm</span>
+                    </a>
+                </li>
+
+                <li
+                        class="sidebar-item" id="statistic">
+                    <a th:href="@{/statistic}" class='sidebar-link'>
+                        <i class="bi bi-bar-chart-line-fill"></i>
+                        <span>Thống kê</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+    let sidebarItems = document.querySelectorAll('.sidebar-item');
+
+    sidebarItems.forEach(function(item) {
+        item.querySelector('.sidebar-link').addEventListener('click', function(e) {
+            localStorage.setItem('activeSidebarItem', item.getAttribute('id'));
+        });
+    });
+
+    let activeItemId = localStorage.getItem('activeSidebarItem');
+    if (activeItemId) {
+        let activeItem = document.getElementById(activeItemId);
+        if (activeItem) {
+            sidebarItems.forEach(function(item) {
+                item.classList.remove('active');
+            });
+            activeItem.classList.add('active');
+        }
+    } else {
+        let activeItem = document.getElementById('dashboard');
+        activeItem.classList.add('active');
+        localStorage.setItem('activeSidebarItem', activeItem.getAttribute('id'));
+    }
+});
+</script>
+</body>
+</html>
