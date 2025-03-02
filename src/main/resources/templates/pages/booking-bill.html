@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head>
+    <meta charset="UTF-8">
+    <title>AdvenTour - Trang quản lý du lịch</title>
+    <style>
+        .setting{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        .accept{
+            background-color: #3FC28A1A;
+            border-radius: 4px;
+            font-size: 14px;
+            height: 28px;
+            color: #6ad0a5 !important;
+            justify-content: center;
+        }
+        .waiting{
+            background-color: #fef9e9;
+            border-radius: 4px;
+            font-size: 14px;
+            height: 28px;
+            color: #f4c726 !important;
+            justify-content: center;
+        }
+        .cancel{
+            background-color: #feeff0;
+            border-radius: 4px;
+            font-size: 14px;
+            height: 28px;
+            color: red !important;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div class="page-heading" layout:fragment="content">
+    <span th:replace="fragments/header :: header (pageTitle='Thông tin khách hàng', subtitle='Tất cả khách hàng &gt; ' + ${customer.nameCustomer})"></span>
+    <section class="section">
+    <div class="col-12">
+        <div class = "card">
+            <div class="user-menu d-flex" style="margin: 20px 30px; border-bottom: 1px solid #d5d5d5;">
+                <div class="user-img d-flex align-items-center">
+                    <div class="user-img d-flex align-items-center">
+                        <img style="width: 100px; height: 100px; border-radius: 10px; margin: 10px;" th:if="${customer.imagesCustomer != null and customer.imagesCustomer.length > 0}" th:src="'https://ztxujxoonvnlhrnacclt.supabase.co/storage/v1/object/public/' + ${customer.imagesCustomer[0]}">
+                        <img style="width: 100px; height: 100px; border-radius: 10px; margin: 10px;" th:unless="${customer.imagesCustomer != null and customer.imagesCustomer.length > 0}" src="https://ztxujxoonvnlhrnacclt.supabase.co/storage/v1/object/public/testBucket/avt.jpg" />
+                    </div>
+                </div>
+                <div class="user-name text-end me-3" style="display: flex;flex-direction: column;justify-content: center;">
+                    <h6 th:text="${customer.nameCustomer}" class="d-flex" style="font-size: 20px; margin-bottom: 5px;"></h6>
+                    <p class="text-subtitle fw-light text-muted small" style="display: flex; align-items: center; margin-bottom: 5px; font-size: 15px; color: black !important;">
+                        <i class="bi bi-phone" style="display: flex; margin-right: 5px;"></i>
+                        <span th:text="${customer.phoneNumber}"></span>
+                    </p>
+                    <p class="text-subtitle fw-light text-muted small" style="display: flex; align-items: center; font-size: 15px; color: black !important;">
+                        <i class="bi bi-envelope" style="display: flex; margin-right: 5px;"></i>
+                        <span th:text="${customer.email}"></span>
+                    </p>
+                </div>
+            </div>
+            <div style="display:flex; justify-content: space-between">
+                <div class="col-12 col-lg-2" style="margin-left: 30px;">
+                    <div class="list-group">
+                        <a th:href="@{/customer/{id}(id=${customer.id})}" type="button" class="list-group-item list-group-item-action" style="height: 50px;display: flex;align-items: center;">
+                            <i class="bi bi-person" style="display: flex; margin-right: 20px;"></i>
+                            Hồ Sơ
+                        </a>
+                        <a th:href="@{/booking/{id}(id=${customer.id})}" type="button" class="list-group-item list-group-item-action active" style="height: 50px;display: flex;align-items: center;">
+                            <i class="bi bi-pass" style="display: flex; margin-right: 20px;"></i>
+                            Phiếu đặt chỗ
+                        </a>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-9">
+                    <div class="card">
+                        <div class="card-body" style="padding: 0px !important;">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-lg">
+                                    <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Mã phiếu</th>
+                                        <th>Số lượng</th>
+                                        <th>Ngày đặt</th>
+                                        <th>Trạng thái</th>
+                                        <th>Tổng tiền</th>
+                                    </tr>
+                                    </thead>
+                                    <th:block th:each="booking, stat : ${bookings}">
+                                    <tbody>
+                                    <tr>
+                                        <td class="col-auto">
+                                            <p class=" mb-0" th:text="${stat.count}"></p>
+                                        </td>
+                                        <td class="col-auto">
+                                            <p class=" mb-0" th:text="${booking.id}"></p>
+                                        </td>
+                                        <td class="col-auto">
+                                            <p class=" mb-0" th:text="${booking.numberOfPassengers}"></p>
+                                        </td>
+                                        <td class="col-auto">
+                                            <p class=" mb-0" th:text="${#temporals.format(booking.bookingDate, 'dd/MM/yyyy')}"></p>
+                                        </td>
+                                        <td class="col-auto">
+                                            <p class="mb-0 setting">
+                                                <span style="width: 100px;" class = "cancel setting" th:if="${booking.status==T(com.adventour.web.enums.StatusOfBooking).CANCELLED}">Đã hủy</span>
+                                                <span style="width: 100px;" class = "waiting setting" th:if="${booking.status==T(com.adventour.web.enums.StatusOfBooking).PENDING}">Đang chờ</span>
+                                                <span style="width: 100px;" class = "accept setting" th:if="${booking.status==T(com.adventour.web.enums.StatusOfBooking).COMPLETED}">Hoàn tất</span>
+                                            </p>
+                                        </td>
+                                        <td class="col-auto">
+                                            <p class=" mb-0" th:text="${formatNumber.formatNumberWithCommas(booking.totalAmount)}"></p>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                    </th:block>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+<script src="/compiled/js/script.js"></script>
+</body>
+</html>

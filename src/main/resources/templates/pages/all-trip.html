@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/dashboard}">
+<head>
+    <meta charset="UTF-8">
+    <title>AdvenTour - Trang quản lý du lịch</title>
+    <style>
+        th{
+            color: #b3b3b8;
+        }
+
+        td{
+            color: black;
+        }
+
+        .pd{
+            padding: 6px;
+        }
+
+        .border-left-choose{
+            border-left: 7px solid;
+            border-left-color: #d1d0d4;
+        }
+
+        .active{
+            border-left-color: #52a6f3;
+        }
+
+        .cancelled{
+            border-left-color: red;
+        }
+
+
+        .input-style{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-style{
+            display: flex;
+            align-items: center;
+            margin: 0px !important;
+            height: 42px;
+            padding: 0 25px;
+            color: white;
+            background-color: #52a6f3;
+        }
+        .page-link{
+            background-color: white !important;
+            color: #52A6F3 !important;
+        }
+
+        .page-item + .page-item{
+            padding-left: 5px;
+        }
+
+        .discount{
+            width: 47px;
+            height: 24px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ecf9f3;
+            color: #5fcd9e;
+            margin-left: 15px;
+            border-radius: 5px;
+        }
+
+        .text-ellipsis {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+<div class="page-heading" layout:fragment="content">
+    <span th:replace="fragments/header :: header (pageTitle='Tất cả chuyến du lịch', subtitle='Thông tin tất cả chuyến du lịch')"></span>
+    <section class="section">
+    <div class = "col-12">
+        <div class="card">
+            <form th:action="@{/alltrip}">
+                <div class="card-header input-style">
+                    <div class="form-group position-relative has-icon-left">
+                        <input type="search" id="search" name="keyword" class="form-control" placeholder="Tìm kiếm chuyến du lịch" style="width: 400px; height: 42px" th:value="${keyword}">
+                        <div class="form-control-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <a th:href="@{add-new-trip}" class="btn btn-block btn-xl btn-outline-primary font-bold mt-3 btn-style">
+                            <i class="bi bi-plus-circle" style="display: flex; padding-right: 30px;"></i>
+                            Thêm chuyến du lịch mới
+                        </a>
+                    </div>
+                </div>
+            </form>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-lg">
+                        <thead>
+                        <tr>
+                            <th class="pd">STT</th>
+                            <th class="pd">Tên chuyến du lịch</th>
+                            <th class="pd">Mã chuyến</th>
+                            <th class="pd">Ngày</th>
+                            <th class="pd">Giá vé</th>
+                            <th class="pd">Số lượng</th>
+                            <th class="pd"></th>
+                        </tr>
+                        </thead>
+                        <th:block th:each="trip, tripStat : ${trips}">
+                        <tbody>
+                        <tr>
+                            <td class="col-1 pd border-left-choose"
+                                th:classappend="${trip.status == null or trip.status != 'CANCELLED'} ? (${trip.isActive} ? 'active') : 'cancelled'">
+                                <div th:text="${tripStat.count}" class="d-flex align-items-center">
+                                </div>
+                            </td>
+                            <td class="col-3 pd" style="">
+                                <div class="d-flex align-items-center">
+                                    <p class="font-bold mb-0 text-ellipsis" th:text="${trip.name}"></p>
+                                </div>
+                            </td>
+                            <td class="col-auto pd">
+                                <div class="d-flex align-items-center" th:text="${trip.code}">
+                                </div>
+                            </td>
+                            <td class="col-auto pd">
+                                <div class="d-flex align-items-center" th:text="${#temporals.format(trip.startDate, 'dd/MM/yyyy')}">
+                                </div>
+                            </td>
+                            <td class="col-auto pd">
+                                <div style="" class="d-flex">
+<!--                                    <div class="d-flex align-items-center" th:text="${trip.priceTicket}">-->
+                                        <div class="d-flex align-items-center" th:text="${formatNumber.formatNumberWithCommas(trip.actualPrice)}">
+                                    </div>
+                                    <div th:if="${trip.discount != 0}" th:text="'-' + ${trip.discount} + '%'" class="discount">
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="col-auto pd">
+                                <div class="d-flex align-items-center">
+                                    <p th:style="${trip.actualPassenger == trip.slots} ? 'color: red;'"
+                                       th:text="${trip.actualPassenger + '/' + trip.slots}">
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="col-auto pd">
+                                <div style="color: black; cursor: pointer;">
+                                    <a th:href="@{/information/{id}(id=${trip.id})}"><i class="bi bi-eye" style="padding-right: 5px;"></i></a>
+                                    <a th:href="@{/information/{tripId}/edit(tripId=${trip.id})}"><i class="bi bi-pencil" style="padding-right: 5px;"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                        </th:block>
+                    </table>
+                </div>
+                <div class="dataTable-bottom" style="
+                            display: flex;
+                            align-items: center;
+                    ">
+                    <div class="me-3" style="display: flex; align-items: center;">
+                        <i class="bi bi-circle-fill" style="display: flex; align-items: center; font-size:10px; color:#52a6f3; "></i>
+                        <p class="mb-0" th:text="'Đang diễn ra'"></p>
+                    </div>
+                    <div class="me-3" style="display: flex; align-items: center;">
+                        <i class="bi bi-circle-fill" style="display: flex; align-items: center; font-size:10px; color:#d1d0d4; "></i>
+                        <p class="mb-0" th:text="'Đã kết thúc'"></p>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <i class="bi bi-circle-fill" style="display: flex; align-items: center; font-size:10px; color:red; "></i>
+                        <p class="mb-0" th:text="'Đã hủy'"></p>
+                    </div>
+<!--                    <nav class="dataTable-pagination">-->
+<!--                        <ul class="dataTable-pagination-list pagination pagination-primary" style="margin: 0;">-->
+<!--                            <li class="pager page-item">-->
+<!--                                <a href="#" data-page="2" class="page-link"><</a>-->
+<!--                            </li>-->
+<!--                            <li class="active page-item">-->
+<!--                                <a href="#" data-page="1" class="page-link">1</a>-->
+<!--                            </li>-->
+<!--                            <li class="page-item">-->
+<!--                                <a href="#" data-page="2" class="page-link">2</a>-->
+<!--                            </li>-->
+<!--                            <li class="page-item">-->
+<!--                                <a href="#" data-page="3" class="page-link">3</a>-->
+<!--                            </li>-->
+<!--                            <li class="page-item">-->
+<!--                                <a href="#" data-page="4" class="page-link">4</a>-->
+<!--                            </li>-->
+<!--                            <li class="pager page-item">-->
+<!--                                <a href="#" data-page="2" class="page-link">></a>-->
+<!--                            </li>-->
+<!--                        </ul>-->
+<!--                    </nav>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+<script src="/compiled/js/script.js"></script>
+</body>
+</html>
